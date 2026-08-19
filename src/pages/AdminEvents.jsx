@@ -17,6 +17,27 @@ export default function AdminEvents() {
   const [eventRegistrations, setEventRegistrations] = useState([]);
   const [loadingRegs, setLoadingRegs] = useState(false);
 
+  // Direct Registration State (Event Adder can add team & members)
+  const [directRegisterOpen, setDirectRegisterOpen] = useState(false);
+  const [directSubmitting, setDirectSubmitting] = useState(false);
+  const [directForm, setDirectForm] = useState({
+    teamName: "",
+    leaderName: "",
+    leaderEmail: "",
+    leaderPhone: "",
+    college: "Nexora Campus",
+    department: "Computer Science",
+    year: "3rd Year",
+    rollNumber: "",
+    projectName: "",
+    domain: "Artificial Intelligence & ML",
+    stage: "Prototype / MVP",
+    description: "Directly added by event coordinator.",
+    members: [
+      { memberName: "", memberEmail: "", memberPhone: "", role: "Team Member" }
+    ],
+  });
+
   const [form, setForm] = useState({
     title: "",
     category: "Hackathon",
@@ -59,7 +80,7 @@ export default function AdminEvents() {
     setEditingEvent(null);
     setForm({
       title: "",
-      category: "Hackathon",
+      category: "Flagship Hackathon",
       badge: "FLAGSHIP EVENT",
       date: "",
       venue: "Main Innovation Auditorium & Online",
@@ -76,7 +97,7 @@ export default function AdminEvents() {
     setEditingEvent(evt);
     setForm({
       title: evt.title || "",
-      category: evt.category || "Hackathon",
+      category: evt.category || "Flagship Hackathon",
       badge: evt.badge || "FLAGSHIP EVENT",
       date: evt.date || "",
       venue: evt.venue || "Main Innovation Auditorium & Online",
@@ -132,6 +153,80 @@ export default function AdminEvents() {
       alert(err?.message || "Unable to load registrations for this event.");
     } finally {
       setLoadingRegs(false);
+    }
+  };
+
+  // Direct Registration (Add Team & Members)
+  const openDirectRegisterModal = (evt) => {
+    setSelectedEvent(evt);
+    setDirectForm({
+      teamName: "",
+      leaderName: "",
+      leaderEmail: "",
+      leaderPhone: "",
+      college: "Nexora Campus",
+      department: "Computer Science",
+      year: "3rd Year",
+      rollNumber: "",
+      projectName: "",
+      domain: "Artificial Intelligence & ML",
+      stage: "Prototype / MVP",
+      description: "Directly added by event coordinator.",
+      members: [
+        { memberName: "", memberEmail: "", memberPhone: "", role: "Team Member" }
+      ],
+    });
+    setDirectRegisterOpen(true);
+  };
+
+  const addDirectMember = () => {
+    if (directForm.members.length >= 4) {
+      alert("Maximum 4 additional members allowed.");
+      return;
+    }
+    setDirectForm((prev) => ({
+      ...prev,
+      members: [
+        ...prev.members,
+        { memberName: "", memberEmail: "", memberPhone: "", role: "Team Member" }
+      ],
+    }));
+  };
+
+  const removeDirectMember = (index) => {
+    setDirectForm((prev) => ({
+      ...prev,
+      members: prev.members.filter((_, idx) => idx !== index),
+    }));
+  };
+
+  const updateDirectMember = (index, field, value) => {
+    setDirectForm((prev) => {
+      const newMems = [...prev.members];
+      newMems[index] = { ...newMems[index], [field]: value };
+      return { ...prev, members: newMems };
+    });
+  };
+
+  const handleDirectRegisterSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedEvent) return;
+
+    try {
+      setDirectSubmitting(true);
+      await api.post(`/api/v1/admin/events/${selectedEvent.eventId}/direct-register`, {
+        ...directForm,
+        eventName: selectedEvent.title,
+      });
+
+      alert("Team and members directly registered and approved successfully!");
+      setDirectRegisterOpen(false);
+      viewEventRegistrations(selectedEvent);
+      loadEvents();
+    } catch (err) {
+      alert(err?.message || "Failed to register team.");
+    } finally {
+      setDirectSubmitting(false);
     }
   };
 
@@ -233,7 +328,7 @@ export default function AdminEvents() {
             <span className="admin-section-badge">EVENT CONTROL HUB</span>
             <h1>Events & Competitions</h1>
             <p>
-              Create, configure, and isolate registration rosters for all hackathons and bootcamps.
+              Create events, add participants & teams, manage rosters, and issue batch credentials.
             </p>
           </div>
 
@@ -297,18 +392,26 @@ export default function AdminEvents() {
 
                 <p className="event-admin-desc">{evt.description}</p>
 
-                {/* EVENT ROSTER COUNTER */}
+                {/* EVENT ROSTER COUNTER & ADD PARTICIPANT */}
                 <div className="event-roster-stat">
                   <div>
                     <span className="roster-number">{evt.totalRegistrations ?? 0}</span>
                     <span className="roster-label">Registered Teams</span>
                   </div>
-                  <button
-                    className="view-roster-btn"
-                    onClick={() => viewEventRegistrations(evt)}
-                  >
-                    View Roster & CSV →
-                  </button>
+                  <div className="roster-btn-group">
+                    <button
+                      className="button button-small button-ghost"
+                      onClick={() => openDirectRegisterModal(evt)}
+                    >
+                      + Add Team
+                    </button>
+                    <button
+                      className="view-roster-btn"
+                      onClick={() => viewEventRegistrations(evt)}
+                    >
+                      View Roster →
+                    </button>
+                  </div>
                 </div>
 
                 {/* CARD ACTIONS */}
@@ -474,8 +577,168 @@ export default function AdminEvents() {
         </div>
       )}
 
+      {/* DIRECT TEAM & MEMBER REGISTRATION MODAL */}
+      {directRegisterOpen && selectedEvent && (
+        <div className="admin-modal-overlay" onClick={() => setDirectRegisterOpen(false)}>
+          <div className="admin-modal-box wide-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <h2>Direct Add Team & Members</h2>
+                <p>Register a team directly into <strong>{selectedEvent.title}</strong>.</p>
+              </div>
+              <button className="modal-close-btn" onClick={() => setDirectRegisterOpen(false)}>✕</button>
+            </div>
+
+            <form onSubmit={handleDirectRegisterSubmit} className="admin-modal-form">
+              <div className="form-row-2">
+                <div className="modal-field">
+                  <label>Team Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Alpha Creators"
+                    value={directForm.teamName}
+                    onChange={(e) => setDirectForm({ ...directForm, teamName: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Project / Startup Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. SmartAgri Drone"
+                    value={directForm.projectName}
+                    onChange={(e) => setDirectForm({ ...directForm, projectName: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <h3 style={{ fontSize: "14px", margin: "10px 0 4px", color: "#4f46e5" }}>Team Leader Information</h3>
+              <div className="form-row-3">
+                <div className="modal-field">
+                  <label>Leader Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="John Doe"
+                    value={directForm.leaderName}
+                    onChange={(e) => setDirectForm({ ...directForm, leaderName: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Leader Email *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="john@example.com"
+                    value={directForm.leaderEmail}
+                    onChange={(e) => setDirectForm({ ...directForm, leaderEmail: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Leader Phone (10 Digits) *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="9876543210"
+                    value={directForm.leaderPhone}
+                    onChange={(e) => setDirectForm({ ...directForm, leaderPhone: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="modal-field">
+                  <label>College / Institution</label>
+                  <input
+                    type="text"
+                    placeholder="Nexora Campus"
+                    value={directForm.college}
+                    onChange={(e) => setDirectForm({ ...directForm, college: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Innovation Domain</label>
+                  <select
+                    value={directForm.domain}
+                    onChange={(e) => setDirectForm({ ...directForm, domain: e.target.value })}
+                  >
+                    <option value="Artificial Intelligence & ML">Artificial Intelligence & ML</option>
+                    <option value="FinTech & Web3">FinTech & Web3</option>
+                    <option value="HealthTech & BioTech">HealthTech & BioTech</option>
+                    <option value="CleanTech & Sustainability">CleanTech & Sustainability</option>
+                    <option value="EdTech & Skill Development">EdTech & Skill Development</option>
+                    <option value="Robotics, Drones & IoT">Robotics, Drones & IoT</option>
+                    <option value="Other DeepTech">Other DeepTech</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* TEAM MEMBERS LIST IN DIRECT MODAL */}
+              <div style={{ margin: "14px 0 6px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <h3 style={{ fontSize: "14px", color: "#4f46e5", margin: 0 }}>Team Members ({directForm.members.length})</h3>
+                <button
+                  type="button"
+                  className="button button-small button-ghost"
+                  onClick={addDirectMember}
+                >
+                  + Add Member
+                </button>
+              </div>
+
+              {directForm.members.map((mem, idx) => (
+                <div key={idx} style={{ background: "#f8fafc", padding: "12px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                    <strong style={{ fontSize: "12px" }}>Member #{idx + 1}</strong>
+                    <button
+                      type="button"
+                      style={{ color: "#dc2626", border: 0, background: "none", cursor: "pointer", fontSize: "11px", fontWeight: 700 }}
+                      onClick={() => removeDirectMember(idx)}
+                    >
+                      Remove ✕
+                    </button>
+                  </div>
+                  <div className="form-row-3">
+                    <input
+                      type="text"
+                      placeholder="Name"
+                      value={mem.memberName}
+                      onChange={(e) => updateDirectMember(idx, "memberName", e.target.value)}
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={mem.memberEmail}
+                      onChange={(e) => updateDirectMember(idx, "memberEmail", e.target.value)}
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone"
+                      value={mem.memberPhone}
+                      onChange={(e) => updateDirectMember(idx, "memberPhone", e.target.value)}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="button button-ghost"
+                  onClick={() => setDirectRegisterOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="button button-primary" disabled={directSubmitting}>
+                  {directSubmitting ? "Registering..." : "✓ Complete Direct Registration"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* EVENT REGISTRATIONS DRAWER MODAL */}
-      {selectedEvent && (
+      {selectedEvent && !directRegisterOpen && (
         <div className="admin-modal-overlay" onClick={() => setSelectedEvent(null)}>
           <div className="admin-modal-box wide-modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
@@ -484,8 +747,14 @@ export default function AdminEvents() {
                 <p>Isolated registration records for this specific event.</p>
               </div>
               <div className="modal-top-actions">
+                <button
+                  className="button button-small button-primary"
+                  onClick={() => openDirectRegisterModal(selectedEvent)}
+                >
+                  + Add Team
+                </button>
                 <button className="admin-export-button" onClick={exportEventCSV}>
-                  📥 Export Event CSV
+                  📥 Export CSV
                 </button>
                 <button className="modal-close-btn" onClick={() => setSelectedEvent(null)}>
                   ✕
@@ -501,7 +770,14 @@ export default function AdminEvents() {
             ) : eventRegistrations.length === 0 ? (
               <div className="admin-empty-state">
                 <h3>No teams registered for this event yet</h3>
-                <p>Teams registering on the website selecting this event will automatically show here.</p>
+                <p>You can add participants directly using "+ Add Team" above or public registrations will show here.</p>
+                <button
+                  className="button button-primary"
+                  onClick={() => openDirectRegisterModal(selectedEvent)}
+                  style={{ marginTop: "12px" }}
+                >
+                  + Add First Team
+                </button>
               </div>
             ) : (
               <div className="admin-table-wrapper" style={{ marginTop: "16px" }}>

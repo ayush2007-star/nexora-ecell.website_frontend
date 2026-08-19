@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { api } from "../api/client";
 import "./AdminLogin.css";
 
@@ -11,9 +11,14 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const fillAdminCredentials = () => {
+    setEmail("bakt.2007@gmail.com");
+    setPassword("Ayush@2007");
+    setError("");
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     setError("");
 
     if (!email.trim() || !password) {
@@ -25,12 +30,11 @@ export default function AdminLogin() {
 
     try {
       const response = await api.post("/api/v1/auth/login", {
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 
       const data = response?.data || response;
-
       const token = data?.token;
       const user = data?.user;
 
@@ -48,7 +52,7 @@ export default function AdminLogin() {
       navigate("/admin");
     } catch (err) {
       setError(
-        err?.message || "Unable to login. Please try again."
+        err?.message || "Unable to login. Please check credentials."
       );
     } finally {
       setLoading(false);
@@ -69,56 +73,62 @@ export default function AdminLogin() {
         {/* Heading */}
         <div className="admin-login-heading">
           <span className="admin-login-badge">
-            ADMIN PORTAL
+            ADMIN SECURE ACCESS
           </span>
 
           <h1>
-            Welcome <span>back.</span>
+            Welcome <span>Admin.</span>
           </h1>
 
           <p>
-            Sign in to manage registrations and
-            monitor the Nexora Innovation Portal.
+            Sign in to manage registrations, teams, events, and generate verified certificates.
           </p>
+        </div>
+
+        {/* Quick Admin Helper */}
+        <div className="admin-quick-helper">
+          <div className="quick-helper-text">
+            <span>👑 Super Admin Account:</span>
+            <code>bakt.2007@gmail.com</code>
+          </div>
+          <button
+            type="button"
+            className="quick-fill-button"
+            onClick={fillAdminCredentials}
+          >
+            ⚡ Auto-Fill Credentials
+          </button>
         </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit}>
           {/* Email */}
           <div className="admin-field">
-            <label htmlFor="email">
-              Email
-            </label>
-
+            <label htmlFor="email">Admin Email</label>
             <input
               id="email"
               type="email"
-              placeholder="admin@example.com"
+              placeholder="bakt.2007@gmail.com"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(event) => setEmail(event.target.value)}
               autoComplete="email"
               disabled={loading}
+              required
             />
           </div>
 
           {/* Password */}
           <div className="admin-field">
-            <label htmlFor="password">
-              Password
-            </label>
-
+            <label htmlFor="password">Password</label>
             <input
               id="password"
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
+              onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
               disabled={loading}
+              required
             />
           </div>
 
@@ -136,27 +146,16 @@ export default function AdminLogin() {
             disabled={loading}
           >
             <span>
-              {loading
-                ? "Signing in..."
-                : "Sign in to Admin"}
+              {loading ? "Authenticating..." : "Sign In to Admin Portal"}
             </span>
-
-            {!loading && (
-              <span className="admin-login-arrow">
-                →
-              </span>
-            )}
+            {!loading && <span className="admin-login-arrow">→</span>}
           </button>
         </form>
 
-        {/* Back */}
-        <button
-          type="button"
-          className="admin-back-button"
-          onClick={() => navigate("/")}
-        >
-          ← Back to Home
-        </button>
+        {/* Back to Home */}
+        <Link to="/" className="admin-back-button">
+          ← Return to Public Website
+        </Link>
       </section>
     </main>
   );

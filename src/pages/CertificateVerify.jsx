@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { api } from "../api/client";
+import { ASSETS } from "../constants/assets";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "./CertificateVerify.css";
@@ -68,6 +69,8 @@ export default function CertificateVerify() {
     window.print();
   };
 
+  const themeClass = `theme-${certificate?.theme || "gold"}`;
+
   return (
     <div className="website">
       <Navbar />
@@ -88,7 +91,7 @@ export default function CertificateVerify() {
               <form onSubmit={handleSearch} className="cert-search-box">
                 <input
                   type="text"
-                  placeholder="Enter Certificate ID (e.g., NXR-A1B2C3D4E5F6)"
+                  placeholder="Enter Certificate ID (e.g. NXR-XXXXXX)"
                   value={inputCertId}
                   onChange={(e) => setInputCertId(e.target.value)}
                 />
@@ -117,7 +120,7 @@ export default function CertificateVerify() {
                 <p>Tips for verification:</p>
                 <ul>
                   <li>Ensure there are no typos in the Certificate ID.</li>
-                  <li>Certificate IDs begin with <code>NXR-</code>.</li>
+                  <li>Certificate IDs usually begin with <code>NXR-</code>.</li>
                   <li>
                     If you just got approved, please allow a few minutes for
                     issuance.
@@ -138,42 +141,65 @@ export default function CertificateVerify() {
               </div>
 
               {/* Certificate Sheet View */}
-              <div className="cert-sheet">
+              <div className={`cert-sheet ${themeClass}`}>
                 <div className="cert-sheet-border">
-                  <div className="cert-sheet-header">
-                    <div className="cert-logo-title">
-                      <h2>NEXORA E-CELL</h2>
-                      <span>INNOVATION • ENTREPRENEURSHIP • IMPACT</span>
-                    </div>
-                    <div className="cert-id-tag">
-                      ID: <strong>{certificate.certificateId}</strong>
-                    </div>
-                  </div>
+                  <div className="cert-sheet-inner">
+                    {/* CORNER ORNAMENTS */}
+                    <div className="corner-ornament top-left">✦</div>
+                    <div className="corner-ornament top-right">✦</div>
+                    <div className="corner-ornament bottom-left">✦</div>
+                    <div className="corner-ornament bottom-right">✦</div>
 
-                  <div className="cert-sheet-body">
-                    <p className="cert-intro">This is to officially certify that</p>
-                    <h3 className="cert-recipient">
-                      {certificate.leaderName || "Team Representative"}
-                    </h3>
-                    <p className="cert-team-text">
-                      representing team <strong>"{certificate.teamName}"</strong>
-                    </p>
-                    <p className="cert-description">
-                      has successfully registered and qualified as an innovative
-                      startup team under the <strong>NEXORA E-CELL Entrepreneurship Initiative</strong>.
-                    </p>
-                  </div>
-
-                  <div className="cert-sheet-footer">
-                    <div className="cert-seal-box">
-                      <div className="gold-seal">★ NEXORA ★ OFFICIAL</div>
-                      <span>OFFICIAL SEAL</span>
+                    <div className="cert-sheet-header">
+                      <div className="cert-logo-title">
+                        <img
+                          src={certificate.logoUrl || ASSETS.logoPrimary}
+                          alt="Nexora Logo"
+                          className="cert-logo-badge"
+                        />
+                        <div>
+                          <h2>NEXORA E-CELL</h2>
+                          <span>CENTRE FOR INNOVATION & ENTREPRENEURSHIP</span>
+                        </div>
+                      </div>
+                      <div className="cert-id-tag">
+                        ID: <strong>{certificate.certificateId}</strong>
+                      </div>
                     </div>
 
-                    <div className="cert-meta-box">
-                      <div>
-                        <label>Issue Date</label>
-                        <strong>
+                    <div className="cert-sheet-body">
+                      <div className="cert-kicker-text">THIS CERTIFICATE IS PROUDLY PRESENTED TO</div>
+                      <h3 className="cert-recipient">
+                        {certificate.leaderName || "Team Representative"}
+                      </h3>
+                      <p className="cert-team-text">
+                        Team: <strong>"{certificate.teamName}"</strong>
+                        {certificate.projectName && certificate.projectName !== certificate.teamName && (
+                          <span> | Project: <strong>"{certificate.projectName}"</strong></span>
+                        )}
+                      </p>
+
+                      {certificate.memberNames && certificate.memberNames.length > 0 && (
+                        <p className="cert-members-text">
+                          Team Members: <em>{certificate.memberNames.join(", ")}</em>
+                        </p>
+                      )}
+
+                      <h4 className="cert-custom-title">{certificate.title || "Certificate of Excellence"}</h4>
+                      
+                      <div className="cert-event-tag">
+                        {certificate.eventTitle || "Nexora Innovation Initiative"}
+                      </div>
+
+                      <p className="cert-description">
+                        {certificate.customMessage ||
+                          "In recognition of outstanding innovative thinking, active problem-solving, and dedication to entrepreneurial excellence."}
+                      </p>
+                    </div>
+
+                    <div className="cert-sheet-footer">
+                      <div className="cert-footer-col">
+                        <div className="cert-date-text">
                           {certificate.generatedAt
                             ? new Date(certificate.generatedAt).toLocaleDateString(
                                 "en-US",
@@ -184,24 +210,43 @@ export default function CertificateVerify() {
                                 }
                               )
                             : "—"}
-                        </strong>
+                        </div>
+                        <div className="cert-line-divider" />
+                        <span>Date of Issuance</span>
                       </div>
-                      <div>
-                        <label>Team ID</label>
-                        <strong>{certificate.teamId || "—"}</strong>
-                      </div>
-                      <div>
-                        <label>Credential Status</label>
-                        <strong className="status-active">
-                          {certificate.status || "Active"}
-                        </strong>
-                      </div>
-                    </div>
 
-                    <div className="cert-sig-box">
-                      <div className="cert-sig-line" />
-                      <strong>Faculty In-Charge & Convenor</strong>
-                      <span>NEXORA E-CELL</span>
+                      <div className="cert-seal-box">
+                        {certificate.sealUrl ? (
+                          <img
+                            src={certificate.sealUrl}
+                            alt="Official Seal"
+                            className="cert-rendered-seal-img"
+                          />
+                        ) : (
+                          <div className="gold-seal">
+                            <span>★</span>
+                            <strong>NEXORA</strong>
+                            <small>OFFICIAL SEAL</small>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="cert-sig-box">
+                        {certificate.signatureUrl ? (
+                          <img
+                            src={certificate.signatureUrl}
+                            alt="Signature"
+                            className="cert-rendered-sig-img"
+                          />
+                        ) : null}
+                        <strong className="sign-name-text">
+                          {certificate.issuerName || "Prof. A. K. Sharma"}
+                        </strong>
+                        <div className="cert-sig-line" />
+                        <span className="sign-title-text">
+                          {certificate.issuerTitle || "Convener & Head of Incubation"}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -210,10 +255,10 @@ export default function CertificateVerify() {
               <div className="cert-actions">
                 <button
                   type="button"
-                  className="button button-primary"
+                  className="button button-primary button-glow"
                   onClick={handlePrint}
                 >
-                  🖨️ Print / Save PDF
+                  🖨️ Print / Save as PDF
                 </button>
 
                 <button

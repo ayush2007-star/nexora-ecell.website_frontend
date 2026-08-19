@@ -17,6 +17,31 @@ export default function AdminRegistrationDetails() {
   const [showRejectBox, setShowRejectBox] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Member Management Modals
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
+  const [memberForm, setMemberForm] = useState({
+    memberName: "",
+    memberEmail: "",
+    memberPhone: "",
+    role: "Team Member",
+  });
+  const [memberLoading, setMemberLoading] = useState(false);
+
+  // Custom Certificate Options
+  const [showCertEditor, setShowCertEditor] = useState(false);
+  const [certOptions, setCertOptions] = useState({
+    theme: "gold",
+    title: "Certificate of Excellence",
+    issuerName: "Prof. A. K. Sharma",
+    issuerTitle: "Convener & Head of Incubation",
+    customMessage: "In recognition of outstanding innovative thinking, active problem-solving, and dedication to entrepreneurial excellence.",
+    logoUrl: "",
+    signatureUrl: "",
+    sealUrl: "",
+  });
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const user = JSON.parse(
     localStorage.getItem("nexora_user") || "null"
   );
@@ -52,6 +77,18 @@ export default function AdminRegistrationDetails() {
       if (certResponse.status === "fulfilled") {
         const certData = certResponse.value?.data || certResponse.value;
         setCertificate(certData);
+        if (certData) {
+          setCertOptions({
+            theme: certData.theme || "gold",
+            title: certData.title || "Certificate of Excellence",
+            issuerName: certData.issuerName || "Prof. A. K. Sharma",
+            issuerTitle: certData.issuerTitle || "Convener & Head of Incubation",
+            customMessage: certData.customMessage || "In recognition of outstanding innovative thinking, active problem-solving, and dedication to entrepreneurial excellence.",
+            logoUrl: certData.logoUrl || "",
+            signatureUrl: certData.signatureUrl || "",
+            sealUrl: certData.sealUrl || "",
+          });
+        }
       } else {
         setCertificate(null);
       }
@@ -119,15 +156,105 @@ export default function AdminRegistrationDetails() {
     }
   };
 
+  // Member Management Handlers
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    if (!memberForm.memberName.trim() || !memberForm.memberEmail.trim()) {
+      alert("Please provide member name and email.");
+      return;
+    }
+
+    try {
+      setMemberLoading(true);
+      await api.post(`/api/v1/admin/registration/${teamId}/members`, memberForm);
+      setShowAddMember(false);
+      setMemberForm({ memberName: "", memberEmail: "", memberPhone: "", role: "Team Member" });
+      await loadRegistration();
+      alert("Team member added successfully!");
+    } catch (err) {
+      alert(err?.message || "Failed to add member.");
+    } finally {
+      setMemberLoading(false);
+    }
+  };
+
+  const handleEditMemberSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingMember) return;
+
+    try {
+      setMemberLoading(true);
+      const memberId = editingMember.memberId || editingMember._id;
+      await api.put(`/api/v1/admin/registration/${teamId}/members/${memberId}`, memberForm);
+      setEditingMember(null);
+      setMemberForm({ memberName: "", memberEmail: "", memberPhone: "", role: "Team Member" });
+      await loadRegistration();
+      alert("Team member updated successfully!");
+    } catch (err) {
+      alert(err?.message || "Failed to update member.");
+    } finally {
+      setMemberLoading(false);
+    }
+  };
+
+  const handleDeleteMember = async (member) => {
+    const name = member.memberName || member.name || "this member";
+    const confirmed = window.confirm(`Are you sure you want to remove "${name}" from this team?`);
+    if (!confirmed) return;
+
+    try {
+      const memberId = member.memberId || member._id;
+      await api.delete(`/api/v1/admin/registration/${teamId}/members/${memberId}`);
+      await loadRegistration();
+      alert("Member removed.");
+    } catch (err) {
+      alert(err?.message || "Failed to remove member.");
+    }
+  };
+
+  const openEditMemberModal = (member) => {
+    setEditingMember(member);
+    setMemberForm({
+      memberName: member.memberName || member.name || "",
+      memberEmail: member.memberEmail || member.email || "",
+      memberPhone: member.memberPhone || member.phone || "",
+      role: member.role || "Team Member",
+    });
+  };
+
+  // Image Upload Handler for Certificate Images
+  const handleImageUpload = async (e, field) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await api.post("/api/v1/upload/image", formData);
+      const data = res?.data || res;
+      if (data?.url) {
+        setCertOptions((prev) => ({ ...prev, [field]: data.url }));
+        alert(`${field} image uploaded successfully!`);
+      }
+    } catch (err) {
+      alert(err?.message || "Image upload failed.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const generateCertificate = async () => {
     try {
       setCertLoading(true);
       setError("");
 
-      const response = await api.post(`/api/v1/certificate/generate/${teamId}`);
+      const response = await api.post(`/api/v1/certificate/generate/${teamId}`, certOptions);
       const data = response?.data || response;
       setCertificate(data);
-      alert("Official Certificate generated successfully!");
+      setShowCertEditor(false);
+      alert("Official Certificate generated/updated successfully!");
     } catch (err) {
       setError(err?.message || "Unable to generate certificate.");
     } finally {
@@ -165,9 +292,7 @@ export default function AdminRegistrationDetails() {
       <main className="admin-details-page">
         <div className="admin-details-error-page">
           <h2>Registration not found</h2>
-          <p>
-            {error || "The requested registration could not be found."}
-          </p>
+          <p>{error || "The requested registration could not be found."}</p>
           <button
             className="admin-details-back-button"
             onClick={() => navigate("/admin/dashboard")}
@@ -198,12 +323,20 @@ export default function AdminRegistrationDetails() {
           <p>Innovation Portal Administration</p>
         </div>
 
-        <button
-          className="admin-details-back-button"
-          onClick={() => navigate("/admin/dashboard")}
-        >
-          ← Dashboard
-        </button>
+        <div className="admin-header-btns">
+          <Link to="/admin/events" className="admin-nav-item">
+            🎪 Events
+          </Link>
+          <Link to="/admin/certificates" className="admin-nav-item">
+            🎨 Studio
+          </Link>
+          <button
+            className="admin-details-back-button"
+            onClick={() => navigate("/admin/dashboard")}
+          >
+            ← Dashboard
+          </button>
+        </div>
       </header>
 
       {/* CONTENT */}
@@ -212,7 +345,7 @@ export default function AdminRegistrationDetails() {
           <div>
             <span className="admin-details-badge">REGISTRATION DETAILS</span>
             <h1>{team.teamName || "Team Registration"}</h1>
-            <p>Review the complete registration submitted by this team.</p>
+            <p>Review and edit team details, roster members, and credential status.</p>
           </div>
 
           <span
@@ -220,7 +353,7 @@ export default function AdminRegistrationDetails() {
               status
             )}`}
           >
-            {status}
+            ● {status}
           </span>
         </div>
 
@@ -232,7 +365,7 @@ export default function AdminRegistrationDetails() {
           <div className="admin-details-card-header">
             <div>
               <span>01</span>
-              <h2>Team Information</h2>
+              <h2>Team & Event Information</h2>
             </div>
           </div>
 
@@ -244,16 +377,21 @@ export default function AdminRegistrationDetails() {
 
             <div>
               <label>Team ID</label>
-              <strong>{team.teamId || teamId || "—"}</strong>
+              <code>{team.teamId || teamId || "—"}</code>
             </div>
 
             <div>
-              <label>Status</label>
+              <label>Associated Event</label>
+              <strong>{team.eventName || team.eventId || "Flagship Cohort"}</strong>
+            </div>
+
+            <div>
+              <label>Registration Status</label>
               <strong>{status}</strong>
             </div>
 
             <div>
-              <label>Created At</label>
+              <label>Registered Date</label>
               <strong>
                 {team.createdAt
                   ? new Date(team.createdAt).toLocaleString()
@@ -289,22 +427,22 @@ export default function AdminRegistrationDetails() {
             </div>
 
             <div>
-              <label>College</label>
+              <label>College / University</label>
               <strong>{leader.college || "—"}</strong>
             </div>
 
             <div>
-              <label>Department</label>
+              <label>Department / Major</label>
               <strong>{leader.department || "—"}</strong>
             </div>
 
             <div>
-              <label>Year</label>
+              <label>Year of Study</label>
               <strong>{leader.year || "—"}</strong>
             </div>
 
             <div>
-              <label>Roll Number</label>
+              <label>Roll / Student Number</label>
               <strong>{leader.rollNumber || "—"}</strong>
             </div>
           </div>
@@ -315,7 +453,7 @@ export default function AdminRegistrationDetails() {
           <div className="admin-details-card-header">
             <div>
               <span>03</span>
-              <h2>Project Information</h2>
+              <h2>Project Proposal & Verification</h2>
             </div>
           </div>
 
@@ -326,7 +464,7 @@ export default function AdminRegistrationDetails() {
             </div>
 
             <div>
-              <label>Domain</label>
+              <label>Innovation Domain</label>
               <strong>{project.domain || project.category || "—"}</strong>
             </div>
 
@@ -336,7 +474,7 @@ export default function AdminRegistrationDetails() {
             </div>
 
             <div>
-              <label>Eureka Team ID</label>
+              <label>Partner / Eureka Team ID</label>
               <strong>{project.eurekaTeamId || "—"}</strong>
             </div>
 
@@ -362,28 +500,40 @@ export default function AdminRegistrationDetails() {
             )}
 
             <div className="admin-details-full">
-              <label>Description</label>
+              <label>Executive Description</label>
               <p>{project.description || "No project description provided."}</p>
             </div>
           </div>
         </section>
 
-        {/* MEMBERS */}
+        {/* TEAM MEMBERS SECTION WITH ADD / EDIT / DELETE */}
         <section className="admin-details-card">
           <div className="admin-details-card-header">
             <div>
               <span>04</span>
-              <h2>Team Members</h2>
+              <h2>Team Roster & Members</h2>
             </div>
 
-            <span className="admin-members-count">
-              {members.length} member{members.length !== 1 ? "s" : ""}
-            </span>
+            <div className="members-header-actions">
+              <span className="admin-members-count">
+                {members.length} member{members.length !== 1 ? "s" : ""}
+              </span>
+              <button
+                type="button"
+                className="button button-small button-primary"
+                onClick={() => {
+                  setMemberForm({ memberName: "", memberEmail: "", memberPhone: "", role: "Team Member" });
+                  setShowAddMember(true);
+                }}
+              >
+                + Add Member
+              </button>
+            </div>
           </div>
 
           {members.length === 0 ? (
             <div className="admin-no-members">
-              No additional team members registered.
+              No additional team members registered. You can add team members using the "+ Add Member" button above.
             </div>
           ) : (
             <div className="admin-members-list">
@@ -409,7 +559,24 @@ export default function AdminRegistrationDetails() {
                   </div>
 
                   <div className="admin-member-phone">
-                    {member.memberPhone || member.phone || "—"}
+                    📞 {member.memberPhone || member.phone || "—"}
+                  </div>
+
+                  <div className="admin-member-actions">
+                    <button
+                      type="button"
+                      className="member-btn-edit"
+                      onClick={() => openEditMemberModal(member)}
+                    >
+                      ✏️ Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="member-btn-delete"
+                      onClick={() => handleDeleteMember(member)}
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
               ))}
@@ -417,14 +584,224 @@ export default function AdminRegistrationDetails() {
           )}
         </section>
 
-        {/* CERTIFICATE ISSUANCE */}
+        {/* ADD MEMBER MODAL */}
+        {showAddMember && (
+          <div className="admin-modal-overlay" onClick={() => setShowAddMember(false)}>
+            <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Add Team Member</h2>
+                <button className="modal-close-btn" onClick={() => setShowAddMember(false)}>✕</button>
+              </div>
+              <form onSubmit={handleAddMember} className="admin-modal-form">
+                <div className="modal-field">
+                  <label>Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Member Name"
+                    value={memberForm.memberName}
+                    onChange={(e) => setMemberForm({ ...memberForm, memberName: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="member@example.com"
+                    value={memberForm.memberEmail}
+                    onChange={(e) => setMemberForm({ ...memberForm, memberEmail: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Phone Number (10 Digits) *</label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="9876543210"
+                    value={memberForm.memberPhone}
+                    onChange={(e) => setMemberForm({ ...memberForm, memberPhone: e.target.value })}
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="button button-ghost" onClick={() => setShowAddMember(false)}>Cancel</button>
+                  <button type="submit" className="button button-primary" disabled={memberLoading}>
+                    {memberLoading ? "Adding..." : "+ Add to Team"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* EDIT MEMBER MODAL */}
+        {editingMember && (
+          <div className="admin-modal-overlay" onClick={() => setEditingMember(null)}>
+            <div className="admin-modal-box" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Edit Team Member</h2>
+                <button className="modal-close-btn" onClick={() => setEditingMember(null)}>✕</button>
+              </div>
+              <form onSubmit={handleEditMemberSubmit} className="admin-modal-form">
+                <div className="modal-field">
+                  <label>Full Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={memberForm.memberName}
+                    onChange={(e) => setMemberForm({ ...memberForm, memberName: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Email Address *</label>
+                  <input
+                    type="email"
+                    required
+                    value={memberForm.memberEmail}
+                    onChange={(e) => setMemberForm({ ...memberForm, memberEmail: e.target.value })}
+                  />
+                </div>
+                <div className="modal-field">
+                  <label>Phone Number *</label>
+                  <input
+                    type="tel"
+                    required
+                    value={memberForm.memberPhone}
+                    onChange={(e) => setMemberForm({ ...memberForm, memberPhone: e.target.value })}
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button type="button" className="button button-ghost" onClick={() => setEditingMember(null)}>Cancel</button>
+                  <button type="submit" className="button button-primary" disabled={memberLoading}>
+                    {memberLoading ? "Saving..." : "Save Member Details"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* CERTIFICATE ISSUANCE WITH CUSTOM IMAGES & CUSTOMIZATION */}
         <section className="admin-details-card">
           <div className="admin-details-card-header">
             <div>
               <span>05</span>
-              <h2>Official Certificate</h2>
+              <h2>Official Digital Certificate</h2>
             </div>
+            {isApproved && (
+              <button
+                type="button"
+                className="button button-small button-ghost"
+                onClick={() => setShowCertEditor((v) => !v)}
+              >
+                {showCertEditor ? "✕ Hide Customizer" : "⚙️ Customize & Images"}
+              </button>
+            )}
           </div>
+
+          {showCertEditor && (
+            <div className="cert-customizer-box">
+              <h3>Customize Certificate & Images</h3>
+              <div className="form-row-2">
+                <div className="modal-field">
+                  <label>Theme Style</label>
+                  <select
+                    value={certOptions.theme}
+                    onChange={(e) => setCertOptions({ ...certOptions, theme: e.target.value })}
+                  >
+                    <option value="gold">👑 Imperial Gold</option>
+                    <option value="purple">⚡ Electric Indigo</option>
+                    <option value="cyan">💎 Cyber Cyan</option>
+                    <option value="emerald">🌿 Royal Emerald</option>
+                  </select>
+                </div>
+
+                <div className="modal-field">
+                  <label>Certificate Title</label>
+                  <input
+                    type="text"
+                    value={certOptions.title}
+                    onChange={(e) => setCertOptions({ ...certOptions, title: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="modal-field">
+                  <label>Signatory Name</label>
+                  <input
+                    type="text"
+                    value={certOptions.issuerName}
+                    onChange={(e) => setCertOptions({ ...certOptions, issuerName: e.target.value })}
+                  />
+                </div>
+
+                <div className="modal-field">
+                  <label>Signatory Title</label>
+                  <input
+                    type="text"
+                    value={certOptions.issuerTitle}
+                    onChange={(e) => setCertOptions({ ...certOptions, issuerTitle: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* IMAGE UPLOADS FOR CERTIFICATE */}
+              <div className="form-row-3 cert-image-uploads">
+                <div className="modal-field">
+                  <label>✒️ Signature Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, "signatureUrl")}
+                    disabled={uploadingImage}
+                  />
+                  {certOptions.signatureUrl && <small className="img-uploaded-tag">✓ Signature attached</small>}
+                </div>
+
+                <div className="modal-field">
+                  <label>🎖️ Official Seal Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, "sealUrl")}
+                    disabled={uploadingImage}
+                  />
+                  {certOptions.sealUrl && <small className="img-uploaded-tag">✓ Seal attached</small>}
+                </div>
+
+                <div className="modal-field">
+                  <label>🏛️ Custom Logo Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImageUpload(e, "logoUrl")}
+                    disabled={uploadingImage}
+                  />
+                  {certOptions.logoUrl && <small className="img-uploaded-tag">✓ Logo attached</small>}
+                </div>
+              </div>
+
+              <div className="modal-field">
+                <label>Commendation Statement</label>
+                <textarea
+                  rows={2}
+                  value={certOptions.customMessage}
+                  onChange={(e) => setCertOptions({ ...certOptions, customMessage: e.target.value })}
+                />
+              </div>
+
+              <button
+                type="button"
+                className="button button-primary"
+                onClick={generateCertificate}
+                disabled={certLoading || uploadingImage}
+                style={{ marginTop: "12px" }}
+              >
+                {certLoading ? "Generating..." : "⚡ Generate / Update Certificate with Settings"}
+              </button>
+            </div>
+          )}
 
           {certificate ? (
             <div className="admin-cert-info-box">
@@ -432,10 +809,10 @@ export default function AdminRegistrationDetails() {
               <div className="admin-details-grid">
                 <div>
                   <label>Certificate ID</label>
-                  <strong>{certificate.certificateId}</strong>
+                  <code>{certificate.certificateId}</code>
                 </div>
                 <div>
-                  <label>Recipient</label>
+                  <label>Recipient Name</label>
                   <strong>{certificate.leaderName || leader.fullName}</strong>
                 </div>
                 <div>
@@ -452,9 +829,9 @@ export default function AdminRegistrationDetails() {
                 <Link
                   to={`/verify/${certificate.certificateId}`}
                   target="_blank"
-                  className="button button-primary"
+                  className="button button-primary button-glow"
                 >
-                  View Credential Page ↗
+                  View Live Credential Page ↗
                 </Link>
                 <button
                   type="button"
@@ -473,7 +850,7 @@ export default function AdminRegistrationDetails() {
               </p>
               <button
                 type="button"
-                className="button button-primary"
+                className="button button-primary button-glow"
                 onClick={generateCertificate}
                 disabled={certLoading}
               >

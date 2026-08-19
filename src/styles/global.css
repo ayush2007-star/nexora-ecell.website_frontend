@@ -1915,12 +1915,30 @@ img {
 }
 
 @media (max-width: 768px) {
+  /* Performance optimizations for mobile devices */
+  .ambient-canvas {
+    display: none !important;
+  }
+
+  .marquee-track {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+  }
+
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
   .site-header {
     padding: 10px 16px;
   }
 
   .mobile-menu-button {
     display: flex;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    justify-content: center;
   }
 
   .nav-links {
@@ -1937,30 +1955,36 @@ img {
     border: 1px solid var(--border);
     border-radius: 20px;
     box-shadow: 0 20px 50px rgba(15, 23, 42, 0.15);
-    backdrop-filter: blur(24px);
   }
 
   .nav-links-open {
     display: flex;
-    animation: floatSlow 0.3s ease forwards;
   }
 
   .nav-links > a {
     padding: 12px 16px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
 
   .nav-links .nav-register {
     text-align: center;
     margin-top: 6px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .hero-section {
-    padding: 130px 0 60px;
+    padding: 110px 0 50px;
     min-height: auto;
   }
 
   .hero-heading {
-    letter-spacing: -2px;
+    letter-spacing: -1.5px;
+    font-size: clamp(32px, 8vw, 44px);
   }
 
   .hero-stats-luxury {
@@ -1977,22 +2001,22 @@ img {
   .event-banner.luxury-banner {
     flex-direction: column;
     align-items: flex-start;
-    padding: 40px 24px;
+    padding: 30px 20px;
   }
 
   .register-card {
     grid-template-columns: 1fr;
-    padding: 36px 24px;
-    gap: 30px;
+    padding: 28px 18px;
+    gap: 24px;
   }
 
   .register-logo-wrapper {
-    height: 200px;
+    height: 180px;
   }
 
   .footer-main {
     grid-template-columns: 1fr 1fr;
-    gap: 36px;
+    gap: 32px;
   }
 
   .footer-bottom {
@@ -2008,10 +2032,13 @@ img {
 
   .hero-actions {
     flex-direction: column;
+    gap: 10px;
   }
 
   .hero-actions .button {
     width: 100%;
+    min-height: 44px;
+    justify-content: center;
   }
 
   .floating-card {
@@ -2030,11 +2057,11 @@ img {
   }
 
   .action-hub-card {
-    padding: 30px 20px;
+    padding: 24px 16px;
   }
 
   .contact-card {
-    padding: 26px 18px;
+    padding: 22px 16px;
   }
 
   .footer-main {

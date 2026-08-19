@@ -16,6 +16,7 @@ export default function AdminCertificateStudio() {
   const [loading, setLoading] = useState(false);
   const [distributing, setDistributing] = useState(false);
   const [distributionResult, setDistributionResult] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Certificate Design Settings State
   const [theme, setTheme] = useState("gold"); // "gold" | "purple" | "cyan" | "emerald"
@@ -28,6 +29,11 @@ export default function AdminCertificateStudio() {
   const [customMessage, setCustomMessage] = useState(
     "In recognition of outstanding innovative thinking, active problem-solving, and dedication to entrepreneurial excellence in the NEXORA E-CELL ecosystem."
   );
+
+  // Custom Image Assets
+  const [logoUrl, setLogoUrl] = useState("");
+  const [signatureUrl, setSignatureUrl] = useState("");
+  const [sealUrl, setSealUrl] = useState("");
 
   const user = JSON.parse(localStorage.getItem("nexora_user") || "null");
 
@@ -61,6 +67,29 @@ export default function AdminCertificateStudio() {
     }
   };
 
+  // Image Upload Handler
+  const handleImageUpload = async (e, setter, label) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setUploadingImage(true);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await api.post("/api/v1/upload/image", formData);
+      const data = res?.data || res;
+      if (data?.url) {
+        setter(data.url);
+        alert(`✓ ${label} uploaded and applied successfully!`);
+      }
+    } catch (err) {
+      alert(err?.message || "Failed to upload image.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const handleBulkGenerate = async () => {
     const confirmed = window.confirm(
       `Are you sure you want to generate and distribute certificates for ${
@@ -80,6 +109,9 @@ export default function AdminCertificateStudio() {
         issuerName,
         issuerTitle,
         customMessage,
+        logoUrl: logoUrl || undefined,
+        signatureUrl: signatureUrl || undefined,
+        sealUrl: sealUrl || undefined,
       };
 
       const res = await api.post(`/api/v1/certificate/bulk-generate/${selectedEventId}`, payload);
@@ -141,7 +173,7 @@ export default function AdminCertificateStudio() {
         <aside className="studio-controls-panel">
           <div className="studio-panel-heading">
             <h2>Design & Distribution</h2>
-            <p>Customize certificate templates and batch distribute to teams.</p>
+            <p>Customize certificate templates, upload seals & signatures, and batch distribute.</p>
           </div>
 
           <div className="control-group">
@@ -212,6 +244,59 @@ export default function AdminCertificateStudio() {
             />
           </div>
 
+          {/* CUSTOM IMAGE UPLOADS */}
+          <div className="studio-images-box">
+            <h3>Custom Certificate Assets</h3>
+            
+            <div className="img-upload-field">
+              <label>✒️ Convener Signature Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, setSignatureUrl, "Signature")}
+                disabled={uploadingImage}
+              />
+              {signatureUrl && (
+                <div className="img-preview-chip">
+                  <span>✓ Signature Applied</span>
+                  <button type="button" onClick={() => setSignatureUrl("")}>✕</button>
+                </div>
+              )}
+            </div>
+
+            <div className="img-upload-field">
+              <label>🎖️ Official Seal Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, setSealUrl, "Seal")}
+                disabled={uploadingImage}
+              />
+              {sealUrl && (
+                <div className="img-preview-chip">
+                  <span>✓ Seal Applied</span>
+                  <button type="button" onClick={() => setSealUrl("")}>✕</button>
+                </div>
+              )}
+            </div>
+
+            <div className="img-upload-field">
+              <label>🏛️ Institution / Club Logo</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleImageUpload(e, setLogoUrl, "Logo")}
+                disabled={uploadingImage}
+              />
+              {logoUrl && (
+                <div className="img-preview-chip">
+                  <span>✓ Logo Applied</span>
+                  <button type="button" onClick={() => setLogoUrl("")}>✕</button>
+                </div>
+              )}
+            </div>
+          </div>
+
           <div className="control-group">
             <label>Commendation Statement</label>
             <textarea
@@ -249,12 +334,12 @@ export default function AdminCertificateStudio() {
               type="button"
               className="button button-primary button-glow full-btn"
               onClick={handleBulkGenerate}
-              disabled={distributing}
+              disabled={distributing || uploadingImage}
             >
               {distributing ? "Distributing Certificates..." : "🚀 Batch Issue & Distribute Certificates"}
             </button>
             <small>
-              Generates cryptographic tamper-proof Certificate IDs and activates public verification URLs for all approved teams.
+              Generates cryptographic tamper-proof Certificate IDs and activates public verification URLs with custom assets for all approved teams.
             </small>
           </div>
         </aside>
@@ -288,13 +373,20 @@ export default function AdminCertificateStudio() {
                 {/* CERTIFICATE HEADER */}
                 <div className="cert-header">
                   <div className="cert-brand-row">
-                    <img src={ASSETS.logoPrimary} alt="NEXORA" className="cert-logo-icon" />
+                    <img
+                      src={logoUrl || ASSETS.logoPrimary}
+                      alt="NEXORA"
+                      className="cert-logo-icon"
+                    />
                     <div>
                       <div className="cert-brand-name">NEXORA E-CELL</div>
                       <div className="cert-brand-sub">CENTRE FOR INNOVATION & ENTREPRENEURSHIP</div>
                     </div>
                   </div>
-                  <div className="cert-id-stamp">ID: NXR-PREVIEW999</div>
+                  <div className="cert-id-stamp">
+                    <span className="qr-mini-icon">🛡️</span>
+                    ID: <strong>NXR-VERIFIED-2026</strong>
+                  </div>
                 </div>
 
                 {/* CERTIFICATE TITLE */}
@@ -316,20 +408,29 @@ export default function AdminCertificateStudio() {
                 {/* CERTIFICATE FOOTER & SIGNATURES */}
                 <div className="cert-footer">
                   <div className="cert-footer-col">
-                    <div className="cert-date-val">{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</div>
+                    <div className="cert-date-val">
+                      {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                    </div>
                     <div className="cert-line" />
                     <span className="cert-label">Date of Issuance</span>
                   </div>
 
                   <div className="cert-seal">
-                    <div className="seal-circle">
-                      <span>★</span>
-                      <strong>OFFICIAL</strong>
-                      <small>VERIFIED</small>
-                    </div>
+                    {sealUrl ? (
+                      <img src={sealUrl} alt="Official Seal" className="custom-rendered-seal" />
+                    ) : (
+                      <div className="seal-circle">
+                        <span>★</span>
+                        <strong>OFFICIAL</strong>
+                        <small>VERIFIED</small>
+                      </div>
+                    )}
                   </div>
 
                   <div className="cert-footer-col">
+                    {signatureUrl ? (
+                      <img src={signatureUrl} alt="Signature" className="custom-rendered-signature" />
+                    ) : null}
                     <div className="cert-sign-name">{issuerName}</div>
                     <div className="cert-line" />
                     <span className="cert-label">{issuerTitle}</span>
