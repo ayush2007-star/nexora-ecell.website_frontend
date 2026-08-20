@@ -8,6 +8,7 @@ export default function AdminLogin() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,7 +23,7 @@ export default function AdminLogin() {
     setError("");
 
     if (!email.trim() || !password) {
-      setError("Please enter email and password.");
+      setError("Please enter your admin email and password.");
       return;
     }
 
@@ -43,7 +44,7 @@ export default function AdminLogin() {
       }
 
       if (String(user.role).toLowerCase() !== "admin") {
-        throw new Error("Admin access required.");
+        throw new Error("Admin privileges are required to access this portal.");
       }
 
       localStorage.setItem("nexora_access_token", token);
@@ -52,7 +53,7 @@ export default function AdminLogin() {
       navigate("/admin");
     } catch (err) {
       setError(
-        err?.message || "Unable to login. Please check credentials."
+        err?.message || "Unable to authenticate. Please check your credentials."
       );
     } finally {
       setLoading(false);
@@ -61,102 +62,123 @@ export default function AdminLogin() {
 
   return (
     <main className="admin-login-page">
-      <div className="admin-login-background" />
+      <div className="admin-login-bg-glow" />
 
-      <section className="admin-login-card">
-        {/* Brand */}
-        <div className="admin-login-brand">
-          <span className="admin-brand-dot" />
-          <span>NEXORA</span>
-        </div>
+      <div className="admin-login-container">
+        <section className="admin-login-card">
+          {/* Header & Brand */}
+          <div className="admin-login-header">
+            <Link to="/" className="admin-brand-link" title="Go to Nexora Home">
+              <span className="admin-brand-dot" />
+              <strong>NEXORA</strong>
+              <span className="admin-brand-sub">E-CELL</span>
+            </Link>
 
-        {/* Heading */}
-        <div className="admin-login-heading">
-          <span className="admin-login-badge">
-            ADMIN SECURE ACCESS
-          </span>
-
-          <h1>
-            Welcome <span>Admin.</span>
-          </h1>
-
-          <p>
-            Sign in to manage registrations, teams, events, and generate verified certificates.
-          </p>
-        </div>
-
-        {/* Quick Admin Helper */}
-        <div className="admin-quick-helper">
-          <div className="quick-helper-text">
-            <span>👑 Super Admin Account:</span>
-            <code>bakt.2007@gmail.com</code>
-          </div>
-          <button
-            type="button"
-            className="quick-fill-button"
-            onClick={fillAdminCredentials}
-          >
-            ⚡ Auto-Fill Credentials
-          </button>
-        </div>
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Email */}
-          <div className="admin-field">
-            <label htmlFor="email">Admin Email</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="bakt.2007@gmail.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              disabled={loading}
-              required
-            />
+            <span className="admin-login-badge">SECURE ADMIN PORTAL</span>
           </div>
 
-          {/* Password */}
-          <div className="admin-field">
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
-              disabled={loading}
-              required
-            />
+          <div className="admin-login-heading">
+            <h1>Admin Authentication</h1>
+            <p>
+              Sign in to manage registrations, evaluate teams, manage events,
+              and issue cryptographically verified certificates.
+            </p>
           </div>
 
-          {/* Error */}
-          {error && (
-            <div className="admin-login-error">
-              {error}
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="admin-login-form">
+            {error && (
+              <div className="admin-login-error" role="alert">
+                <span className="error-icon">⚠️</span>
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Email Field */}
+            <div className="admin-field">
+              <label htmlFor="admin-email">Admin Email Address</label>
+              <div className="admin-input-wrapper">
+                <span className="input-icon">✉️</span>
+                <input
+                  id="admin-email"
+                  type="email"
+                  placeholder="admin@nexora-ecell.in"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  disabled={loading}
+                  required
+                />
+              </div>
             </div>
-          )}
 
-          {/* Submit */}
-          <button
-            type="submit"
-            className="admin-login-button"
-            disabled={loading}
-          >
-            <span>
-              {loading ? "Authenticating..." : "Sign In to Admin Portal"}
-            </span>
-            {!loading && <span className="admin-login-arrow">→</span>}
-          </button>
-        </form>
+            {/* Password Field */}
+            <div className="admin-field">
+              <div className="field-label-row">
+                <label htmlFor="admin-password">Password</label>
+                <button
+                  type="button"
+                  className="toggle-password-btn"
+                  onClick={() => setShowPassword(!showPassword)}
+                  tabIndex={-1}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              <div className="admin-input-wrapper">
+                <span className="input-icon">🔒</span>
+                <input
+                  id="admin-password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your security password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="current-password"
+                  disabled={loading}
+                  required
+                />
+              </div>
+            </div>
 
-        {/* Back to Home */}
-        <Link to="/" className="admin-back-button">
-          ← Return to Public Website
-        </Link>
-      </section>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className="admin-login-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="btn-spinner" />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In to Admin Hub</span>
+                  <span className="admin-login-arrow">→</span>
+                </>
+              )}
+            </button>
+
+            {/* Quick Demo Fill Helper */}
+            <div className="admin-demo-helper">
+              <button
+                type="button"
+                className="quick-fill-button"
+                onClick={fillAdminCredentials}
+              >
+                <span>⚡ Auto-fill Default Admin Credentials</span>
+              </button>
+            </div>
+          </form>
+
+          {/* Footer Back Link */}
+          <div className="admin-login-footer">
+            <Link to="/" className="admin-back-button">
+              ← Return to NEXORA Public Website
+            </Link>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

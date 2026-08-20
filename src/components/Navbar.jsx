@@ -130,6 +130,15 @@ export default function Navbar() {
           </Link>
         </div>
       </nav>
+
+      {/* MOBILE BACKDROP */}
+      {menuOpen && (
+        <div
+          className="mobile-menu-backdrop"
+          onClick={closeMenu}
+          aria-hidden="true"
+        />
+      )}
     </header>
   );
 }

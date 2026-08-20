@@ -385,6 +385,10 @@ export default function AdminEvents() {
                     <span>📍 {evt.venue || "Campus / Online"}</span>
                   </div>
                   <div>
+                    <label>Team Limit</label>
+                    <strong>👥 Max {evt.maxTeamSize || 3} Members</strong>
+                  </div>
+                  <div>
                     <label>Deadline</label>
                     <span>⏳ {evt.registrationDeadline || "Open"}</span>
                   </div>
@@ -546,6 +550,23 @@ export default function AdminEvents() {
                     value={form.registrationDeadline}
                     onChange={(e) => setForm({ ...form, registrationDeadline: e.target.value })}
                   />
+                </div>
+              </div>
+
+              <div className="form-row-2">
+                <div className="modal-field">
+                  <label>Team Member Limit (Max Members per Team) *</label>
+                  <select
+                    value={form.maxTeamSize}
+                    onChange={(e) => setForm({ ...form, maxTeamSize: Number(e.target.value) })}
+                  >
+                    <option value={1}>1 Member (Solo Only - Individual Event)</option>
+                    <option value={2}>2 Members (Leader + 1 Member)</option>
+                    <option value={3}>3 Members (Leader + 2 Members - Standard)</option>
+                    <option value={4}>4 Members (Leader + 3 Members)</option>
+                    <option value={5}>5 Members (Leader + 4 Members)</option>
+                    <option value={6}>6 Members (Leader + 5 Members)</option>
+                  </select>
                 </div>
               </div>
 

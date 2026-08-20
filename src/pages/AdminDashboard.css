@@ -367,18 +367,21 @@
   border: 1px solid #dfe4ef;
   border-radius: 10px;
   padding: 0 14px;
-  font-size: 14px;
+  font-size: 16px;
   background: #ffffff;
   color: #172033;
   outline: none;
+  box-sizing: border-box;
 }
 
 .admin-search-input {
   width: 280px;
+  max-width: 100%;
 }
 
 .admin-status-filter {
   width: 170px;
+  max-width: 100%;
   cursor: pointer;
 }
 
@@ -429,6 +432,7 @@
   justify-content: center;
   gap: 18px;
   padding: 24px 0 8px;
+  flex-wrap: wrap;
 }
 
 .admin-pagination-button {
@@ -480,6 +484,7 @@
 .admin-top-btns {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .admin-export-button {
@@ -501,8 +506,9 @@
 
 .admin-tabs {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 24px;
+  flex-wrap: wrap;
 }
 
 .admin-tab-btn {

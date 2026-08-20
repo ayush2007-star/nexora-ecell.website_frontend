@@ -491,14 +491,30 @@
 }
 
 @media (max-width: 768px) {
+  .cert-verify-hero {
+    padding: 35px 0 25px;
+  }
   .cert-sheet {
-    padding: 12px;
+    padding: 10px;
+    border-radius: 14px;
+  }
+  .cert-sheet-border {
+    padding: 4px;
   }
   .cert-sheet-inner {
-    padding: 20px 14px;
+    padding: 20px 12px;
+  }
+  .cert-sheet-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    text-align: center;
   }
   .cert-recipient {
-    font-size: 24px;
+    font-size: clamp(20px, 5vw, 26px);
+  }
+  .cert-description {
+    font-size: 12.5px;
   }
   .cert-sheet-footer {
     flex-direction: column;
@@ -507,5 +523,22 @@
   }
   .cert-search-box {
     flex-direction: column;
+    padding: 10px;
+  }
+  .cert-search-box input {
+    padding: 12px 14px;
+    font-size: 16px;
+  }
+  .cert-search-box button {
+    width: 100%;
+    min-height: 48px;
+  }
+  .cert-actions {
+    flex-direction: column;
+  }
+  .cert-actions .button {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
   }
 }

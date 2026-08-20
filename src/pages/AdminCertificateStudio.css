@@ -76,10 +76,11 @@
   border: 1px solid #cbd5e1;
   border-radius: 10px;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 16px; /* Prevents auto-zoom on mobile */
   background: #ffffff;
   color: #0f172a;
   outline: none;
+  box-sizing: border-box;
 }
 
 .control-group input:focus,
