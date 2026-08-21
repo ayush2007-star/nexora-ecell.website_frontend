@@ -1,5 +1,5 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://nexora-ecell-website-backend.onrender.com/";
+  import.meta.env.VITE_API_BASE_URL || "https://nexora-ecell-website-backend.onrender.com";
 
 async function request(endpoint, options = {}) {
   const token = localStorage.getItem("nexora_access_token");
