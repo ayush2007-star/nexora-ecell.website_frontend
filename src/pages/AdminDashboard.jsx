@@ -26,11 +26,15 @@ export default function AdminDashboard() {
   const [error, setError] = useState("");
 
   const user = JSON.parse(
-    localStorage.getItem("nexora_user") || "null"
+    localStorage.getItem("user") ||
+  localStorage.getItem("nexora_user") ||
+  "null"
   );
 
   useEffect(() => {
-    const token = localStorage.getItem("nexora_access_token");
+    const token = localStorage.getItem("access_token") ||
+  localStorage.getItem("nexora_access_token") ||
+  localStorage.getItem("nexra_access_token");
 
     if (!token || String(user?.role).toLowerCase() !== "admin") {
       navigate("/admin/login", { replace: true });
@@ -158,14 +162,14 @@ export default function AdminDashboard() {
   };
 
   const logout = () => {
-    localStorage.removeItem("nexora_access_token");
-    localStorage.removeItem("nexora_user");
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("nexora_access_token");
+  localStorage.removeItem("nexra_access_token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("nexora_user");
 
-    navigate("/admin/login", {
-      replace: true,
-    });
-  };
-
+  window.location.href = "/admin/login";
+};
   if (loading && !dashboard) {
     return (
       <main className="admin-dashboard-loading">
@@ -191,14 +195,44 @@ export default function AdminDashboard() {
 
         {/* NAVIGATION TABS */}
         <nav className="admin-nav-tabs">
+          <Link
+            to="/admin/participants"
+            className="admin-nav-item"
+          >
+            👥 Participants
+          </Link>
           <Link to="/admin/dashboard" className="admin-nav-item active">
             📊 Dashboard
           </Link>
+          <Link to="/admin/attendance" className="admin-nav-item">
+            📋 Attendance & Food
+          </Link>
+          <Link to="/admin/scoring" className="admin-nav-item">
+            🏆 Mentor Scoring
+          </Link>
+          <Link
+            to="/admin/mentors"
+            className="admin-nav-item"
+          >
+            👥 Mentor / Judge Management
+          </Link>
+          <Link
+            to="/admin/management"
+            className="admin-nav-item"
+          >
+            🧑‍💼 Management Accounts
+          </Link>
+          <Link
+            to="/admin/management/updates"
+            className="admin-nav-item"
+          >
+            📊 Management Work Updates
+          </Link>
           <Link to="/admin/events" className="admin-nav-item">
-            🎪 Events Management
+            🎪 Events
           </Link>
           <Link to="/admin/certificates" className="admin-nav-item">
-            🎨 Certificate Studio
+            🎨 Certificates
           </Link>
         </nav>
 
@@ -292,17 +326,15 @@ export default function AdminDashboard() {
         {/* TAB NAVIGATION */}
         <div className="admin-tabs">
           <button
-            className={`admin-tab-btn ${
-              activeTab === "registrations" ? "active" : ""
-            }`}
+            className={`admin-tab-btn ${activeTab === "registrations" ? "active" : ""
+              }`}
             onClick={() => setActiveTab("registrations")}
           >
             📋 Registrations ({pagination.total || registrations.length})
           </button>
           <button
-            className={`admin-tab-btn ${
-              activeTab === "activity" ? "active" : ""
-            }`}
+            className={`admin-tab-btn ${activeTab === "activity" ? "active" : ""
+              }`}
             onClick={() => setActiveTab("activity")}
           >
             ⚡ Activity Logs ({activities.length})
@@ -468,8 +500,8 @@ export default function AdminDashboard() {
                             <span className="table-subtext">
                               {registration.createdAt
                                 ? new Date(
-                                    registration.createdAt
-                                  ).toLocaleDateString()
+                                  registration.createdAt
+                                ).toLocaleDateString()
                                 : "—"}
                             </span>
                           </td>
@@ -549,8 +581,8 @@ export default function AdminDashboard() {
                       {act.action === "APPROVED"
                         ? "✓"
                         : act.action === "REJECTED"
-                        ? "✕"
-                        : "⚡"}
+                          ? "✕"
+                          : "⚡"}
                     </div>
                     <div className="activity-content">
                       <div className="activity-header">

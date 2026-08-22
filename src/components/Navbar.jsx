@@ -20,9 +20,31 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Auto-close mobile menu on route changes
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  // Close menu on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const closeMenu = () => setMenuOpen(false);
 
   const isActive = (path) => location.pathname === path;
+
+  // Check if any user (admin/mentor) is logged in for quick portal link
+  const storedUser = JSON.parse(localStorage.getItem("nexora_user") || "null");
+  const isMentor = String(storedUser?.role).toLowerCase() === "mentor";
+  const isAdmin = String(storedUser?.role).toLowerCase() === "admin";
 
   return (
     <header className={`site-header ${scrolled ? "site-header-scrolled" : ""}`}>
@@ -55,7 +77,7 @@ export default function Navbar() {
         <button
           type="button"
           className={`mobile-menu-button ${menuOpen ? "open" : ""}`}
-          aria-label="Toggle navigation"
+          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((value) => !value)}
         >
@@ -120,14 +142,32 @@ export default function Navbar() {
             <span className="btn-shine" />
           </Link>
 
-          {/* ADMIN PORTAL */}
-          <Link
-            to="/admin/login"
-            className="nav-admin-login"
-            onClick={closeMenu}
-          >
-            Admin Portal
-          </Link>
+          {/* PORTAL LINK: IF LOGGED IN SHOW RELEVANT PORTAL OR DEFAULT ADMIN */}
+          {isMentor ? (
+            <Link
+              to="/mentor"
+              className="nav-admin-login"
+              onClick={closeMenu}
+            >
+              Mentor Portal
+            </Link>
+          ) : isAdmin ? (
+            <Link
+              to="/admin"
+              className="nav-admin-login"
+              onClick={closeMenu}
+            >
+              Admin Portal
+            </Link>
+          ) : (
+            <Link
+              to="/admin/login"
+              className="nav-admin-login"
+              onClick={closeMenu}
+            >
+              Admin Portal
+            </Link>
+          )}
         </div>
       </nav>
 

@@ -419,10 +419,70 @@
 }
 
 @media (max-width: 700px) {
-  .admin-search-input,
-  .admin-status-filter,
-  .admin-filter-button,
-  .admin-clear-button {
+  .admin-dashboard-content {
+    width: calc(100% - 24px);
+    max-width: none;
+  }
+
+  .admin-dashboard-header {
+    padding: 14px 12px;
+  }
+
+  .admin-nav-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-nav-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .admin-page-heading {
+    gap: 14px;
+  }
+
+  .admin-top-btns {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .admin-top-btns button {
+    flex: 1 1 140px;
+  }
+
+  .admin-registration-section {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .admin-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .admin-registration-table {
+    min-width: 850px;
+  }
+
+  .activity-list {
+    padding: 14px;
+  }
+
+  .activity-item {
+    gap: 10px;
+  }
+
+  .activity-header {
+    flex-wrap: wrap;
+  }
+
+  .activity-date {
+    margin-left: 0;
     width: 100%;
   }
 }
@@ -622,4 +682,180 @@
   color: #4f46e5;
   padding: 1px 4px;
   border-radius: 4px;
-}
+}
+/* =========================================================
+   ADMIN DASHBOARD - FINAL RESPONSIVE FIX
+   ========================================================= */
+
+@media (max-width: 850px) {
+  .admin-dashboard-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .admin-dashboard-header {
+    width: 100%;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .admin-brand-section {
+    min-width: 0;
+  }
+
+  .admin-nav-tabs {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+  }
+
+  .admin-nav-item {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .admin-header-actions {
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+
+  .admin-dashboard-content {
+    width: calc(100% - 28px);
+    max-width: 1200px;
+    box-sizing: border-box;
+  }
+
+  .admin-page-heading {
+    width: 100%;
+  }
+
+  .admin-top-btns {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .admin-registration-section {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .admin-section-header {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+  .admin-registration-table {
+    min-width: 850px;
+  }
+
+  .activity-list {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-dashboard-header {
+    padding: 14px;
+  }
+
+  .admin-dashboard-content {
+    width: calc(100% - 20px);
+    padding: 20px 0;
+  }
+
+  .admin-dashboard-brand {
+    font-size: 20px;
+  }
+
+  .admin-portal-tag {
+    font-size: 9px;
+  }
+
+  .admin-header-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between;
+  }
+
+  .admin-home-link,
+  .admin-logout-button {
+    min-height: 40px;
+  }
+
+  .admin-page-heading {
+    gap: 12px;
+  }
+
+  .admin-top-btns {
+    gap: 8px;
+  }
+
+  .admin-export-button,
+  .admin-refresh-button {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .admin-stat-card {
+    min-width: 0;
+  }
+
+  .admin-tabs {
+    width: 100%;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 4px;
+  }
+
+  .admin-tab-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .admin-registration-filters {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .admin-search-input,
+  .admin-status-filter,
+  .admin-filter-button,
+  .admin-clear-button {
+    width: 100%;
+  }
+
+  .activity-item {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .activity-header {
+    flex-wrap: wrap;
+  }
+
+  .activity-date {
+    width: 100%;
+    margin-left: 0;
+  }
+}

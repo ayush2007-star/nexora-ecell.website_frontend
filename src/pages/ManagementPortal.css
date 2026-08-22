@@ -1,0 +1,312 @@
+.management-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.management-header {
+  min-height: 76px;
+  padding: 0 5%;
+  background: #0f172a;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.management-brand {
+  color: white;
+  text-decoration: none;
+  font-weight: 900;
+  letter-spacing: .12em;
+  margin-right: 14px;
+}
+
+.management-badge {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .1em;
+  color: #a5b4fc;
+}
+
+.management-header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.management-admin-link {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.management-user {
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+}
+
+.management-user strong {
+  font-size: 13px;
+}
+
+.management-user span {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.management-logout {
+  border: 0;
+  background: rgba(255,255,255,.1);
+  color: white;
+  padding: 9px 13px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.management-content {
+  width: min(1200px, calc(100% - 32px));
+  margin: auto;
+  padding: 35px 0 70px;
+}
+
+.management-hero {
+  padding: 28px;
+  border-radius: 20px;
+  background: linear-gradient(
+    135deg,
+    #111827,
+    #312e81
+  );
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 25px;
+}
+
+.management-hero > div:first-child > span {
+  color: #a5b4fc;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.management-hero h1 {
+  margin: 7px 0;
+  font-size: 34px;
+}
+
+.management-hero p {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.management-profile-card {
+  min-width: 220px;
+  padding: 18px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.management-profile-card small {
+  color: #cbd5e1;
+}
+
+.management-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}
+
+.management-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(15,23,42,.05);
+}
+
+.management-card-heading span {
+  color: #6366f1;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .12em;
+}
+
+.management-card-heading h2 {
+  margin: 5px 0 22px;
+}
+
+.management-form {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+}
+
+.management-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.management-form input,
+.management-form textarea,
+.management-form select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.management-form textarea {
+  resize: vertical;
+}
+
+.management-form input:focus,
+.management-form textarea:focus,
+.management-form select:focus {
+  border-color: #6366f1;
+}
+
+.management-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.management-submit {
+  border: 0;
+  padding: 13px;
+  border-radius: 10px;
+  background: #4f46e5;
+  color: white;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.management-submit:disabled {
+  opacity: .6;
+}
+
+.management-updates {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.management-update {
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 13px;
+}
+
+.management-update-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.management-update p {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.management-update-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.update-status {
+  white-space: nowrap;
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.update-status.pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.update-status.in-progress {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.update-status.completed {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.update-status.blocked {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.management-empty,
+.management-loading {
+  padding: 45px 10px;
+  text-align: center;
+  color: #64748b;
+}
+
+.management-toast,
+.management-error {
+  padding: 13px 16px;
+  border-radius: 11px;
+  margin-bottom: 18px;
+  font-weight: 700;
+}
+
+.management-toast {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.management-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+@media (max-width: 850px) {
+  .management-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .management-hero {
+    flex-direction: column;
+  }
+
+  .management-header {
+    padding: 15px 20px;
+  }
+
+  .management-header-right {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+}

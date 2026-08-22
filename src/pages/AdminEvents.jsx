@@ -54,7 +54,9 @@ export default function AdminEvents() {
   const user = JSON.parse(localStorage.getItem("nexora_user") || "null");
 
   useEffect(() => {
-    const token = localStorage.getItem("nexora_access_token");
+    const token =  localStorage.getItem("access_token") ||
+  localStorage.getItem("nexora_access_token") ||
+  localStorage.getItem("nexra_access_token");
     if (!token || String(user?.role).toLowerCase() !== "admin") {
       navigate("/admin/login", { replace: true });
       return;
@@ -281,10 +283,14 @@ export default function AdminEvents() {
   };
 
   const logout = () => {
-    localStorage.removeItem("nexora_access_token");
-    localStorage.removeItem("nexora_user");
-    navigate("/admin/login", { replace: true });
-  };
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("nexora_access_token");
+  localStorage.removeItem("nexra_access_token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("nexora_user");
+
+  window.location.href = "/admin/login";
+};
 
   return (
     <main className="admin-events-page">

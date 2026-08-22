@@ -12,9 +12,9 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const fillAdminCredentials = () => {
-    setEmail("bakt.2007@gmail.com");
-    setPassword("Ayush@2007");
+  const fillCredentials = (roleEmail, rolePassword) => {
+    setEmail(roleEmail);
+    setPassword(rolePassword);
     setError("");
   };
 
@@ -23,7 +23,7 @@ export default function AdminLogin() {
     setError("");
 
     if (!email.trim() || !password) {
-      setError("Please enter your admin email and password.");
+      setError("Please enter your email and password.");
       return;
     }
 
@@ -36,24 +36,49 @@ export default function AdminLogin() {
       });
 
       const data = response?.data || response;
+
       const token = data?.token;
       const user = data?.user;
 
       if (!token || !user) {
-        throw new Error("Invalid login response from server.");
+        throw new Error(
+          "Invalid login response from server."
+        );
       }
 
-      if (String(user.role).toLowerCase() !== "admin") {
-        throw new Error("Admin privileges are required to access this portal.");
+      const role = String(
+        user.role || ""
+      )
+        .trim()
+        .toLowerCase();
+
+      // Admin login page accepts ADMIN only.
+      if (role !== "admin") {
+        throw new Error(
+          "This login is restricted to Administrator accounts."
+        );
       }
 
-      localStorage.setItem("nexora_access_token", token);
-      localStorage.setItem("nexora_user", JSON.stringify(user));
+      // Keep the existing project storage keys.
+      localStorage.setItem(
+        "access_token",
+        token
+      );
 
-      navigate("/admin");
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
+      );
+
+      navigate("/admin", {
+        replace: true,
+      });
+
     } catch (err) {
       setError(
-        err?.message || "Unable to authenticate. Please check your credentials."
+        err?.response?.data?.message ||
+        err?.message ||
+        "Unable to authenticate. Please check your credentials."
       );
     } finally {
       setLoading(false);
@@ -74,14 +99,14 @@ export default function AdminLogin() {
               <span className="admin-brand-sub">E-CELL</span>
             </Link>
 
-            <span className="admin-login-badge">SECURE ADMIN PORTAL</span>
+            <span className="admin-login-badge">PORTAL AUTHENTICATION</span>
           </div>
 
           <div className="admin-login-heading">
-            <h1>Admin Authentication</h1>
+            <h1>Administrator Portal</h1>
             <p>
-              Sign in to manage registrations, evaluate teams, manage events,
-              and issue cryptographically verified certificates.
+              Sign in as an Administrator to manage the
+              Nexora E-Cell event platform.
             </p>
           </div>
 
@@ -96,7 +121,7 @@ export default function AdminLogin() {
 
             {/* Email Field */}
             <div className="admin-field">
-              <label htmlFor="admin-email">Admin Email Address</label>
+              <label htmlFor="admin-email">Email Address</label>
               <div className="admin-input-wrapper">
                 <span className="input-icon">✉️</span>
                 <input
@@ -153,22 +178,11 @@ export default function AdminLogin() {
                 </>
               ) : (
                 <>
-                  <span>Sign In to Admin Hub</span>
+                  <span>Sign In to Portal</span>
                   <span className="admin-login-arrow">→</span>
                 </>
               )}
             </button>
-
-            {/* Quick Demo Fill Helper */}
-            <div className="admin-demo-helper">
-              <button
-                type="button"
-                className="quick-fill-button"
-                onClick={fillAdminCredentials}
-              >
-                <span>⚡ Auto-fill Default Admin Credentials</span>
-              </button>
-            </div>
           </form>
 
           {/* Footer Back Link */}

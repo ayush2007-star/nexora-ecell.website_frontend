@@ -1,0 +1,195 @@
+.management-update-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.management-update-header {
+  padding: 35px 6%;
+  background: #020617;
+  color: white;
+}
+
+.management-update-back {
+  color: #a5b4fc;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 950;
+  letter-spacing: .1em;
+}
+
+.management-update-header h1 {
+  margin: 13px 0 7px;
+  font-size: 34px;
+}
+
+.management-update-header p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+.management-update-content {
+  width: min(
+    800px,
+    calc(100% - 32px)
+  );
+  margin: auto;
+  padding: 35px 0 70px;
+}
+
+.management-update-card {
+  padding: 30px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: white;
+  box-shadow:
+    0 15px 40px
+    rgba(15,23,42,.06);
+}
+
+.management-update-card-heading span {
+  color: #6366f1;
+  font-size: 9px;
+  font-weight: 950;
+  letter-spacing: .13em;
+}
+
+.management-update-card-heading h2 {
+  margin: 6px 0;
+  font-size: 25px;
+}
+
+.management-update-card-heading p {
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.management-update-error,
+.management-update-success {
+  margin: 20px 0;
+  padding: 13px 15px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.management-update-error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.management-update-success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.management-update-form {
+  margin-top: 25px;
+  display: grid;
+  gap: 20px;
+}
+
+.management-update-form label {
+  display: grid;
+  gap: 7px;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.management-update-form input,
+.management-update-form textarea,
+.management-update-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 13px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  background: white;
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.management-update-form textarea {
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.management-update-form input:focus,
+.management-update-form textarea:focus,
+.management-update-form select:focus {
+  border-color: #6366f1;
+  box-shadow:
+    0 0 0 3px
+    rgba(99,102,241,.1);
+}
+
+.management-update-form small {
+  text-align: right;
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.management-update-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.management-update-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.management-update-cancel,
+.management-update-actions button {
+  padding: 13px 17px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.management-update-cancel {
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  background: white;
+}
+
+.management-update-actions button {
+  border: 0;
+  background: #4f46e5;
+  color: white;
+  cursor: pointer;
+}
+
+.management-update-actions button:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+  .management-update-card {
+    padding: 20px;
+  }
+
+  .management-update-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .management-update-actions {
+    flex-direction: column-reverse;
+  }
+
+  .management-update-cancel,
+  .management-update-actions button {
+    text-align: center;
+  }
+}

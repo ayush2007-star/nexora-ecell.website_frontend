@@ -1,0 +1,309 @@
+.management-dashboard-page {
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.management-dashboard-header {
+  min-height: 76px;
+  padding: 0 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #020617;
+  color: white;
+}
+
+.management-dashboard-logo {
+  font-size: 15px;
+  font-weight: 950;
+  letter-spacing: .2em;
+}
+
+.management-dashboard-label {
+  margin-top: 4px;
+  color: #818cf8;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.management-dashboard-header-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.management-dashboard-new-btn,
+.management-dashboard-logout {
+  padding: 10px 14px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 900;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.management-dashboard-new-btn {
+  background: #4f46e5;
+  color: white;
+}
+
+.management-dashboard-logout {
+  border: 1px solid #475569;
+  background: transparent;
+  color: white;
+}
+
+.management-dashboard-content {
+  width: min(
+    1200px,
+    calc(100% - 32px)
+  );
+  margin: auto;
+  padding: 35px 0 70px;
+}
+
+.management-dashboard-error {
+  margin-bottom: 20px;
+  padding: 13px 15px;
+  border-radius: 10px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.management-welcome {
+  padding: 30px;
+  border-radius: 18px;
+  background: #0f172a;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.management-welcome span {
+  color: #a5b4fc;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.management-welcome h1 {
+  margin: 8px 0 5px;
+  font-size: 32px;
+}
+
+.management-welcome p {
+  margin: 0;
+  color: #cbd5e1;
+}
+
+.management-user-id {
+  color: #a5b4fc;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.management-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(4, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.management-stat-card {
+  padding: 22px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+}
+
+.management-stat-card span {
+  display: block;
+  color: #64748b;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.management-stat-card strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 29px;
+}
+
+.management-dashboard-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.7fr)
+    minmax(280px, .8fr);
+  gap: 20px;
+}
+
+.management-panel {
+  padding: 23px;
+  border: 1px solid #e2e8f0;
+  border-radius: 17px;
+  background: white;
+}
+
+.management-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.management-panel-heading span {
+  color: #6366f1;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+.management-panel-heading h2 {
+  margin: 5px 0 0;
+  font-size: 21px;
+}
+
+.management-panel-heading a {
+  color: #4f46e5;
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.management-update-list {
+  display: grid;
+}
+
+.management-update-item {
+  padding: 16px 0;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.management-update-item:last-child {
+  border-bottom: 0;
+}
+
+.management-update-item strong {
+  font-size: 14px;
+}
+
+.management-update-item p {
+  max-width: 650px;
+  margin: 5px 0 0;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.management-update-meta {
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.management-status {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 8px;
+  font-weight: 950;
+}
+
+.management-update-meta small {
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.management-profile {
+  display: grid;
+  gap: 18px;
+}
+
+.management-profile div {
+  display: grid;
+  gap: 5px;
+}
+
+.management-profile small {
+  color: #94a3b8;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.management-profile strong {
+  color: #334155;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.management-empty {
+  padding: 45px 15px;
+  text-align: center;
+  color: #64748b;
+}
+
+.management-empty strong {
+  display: block;
+  color: #334155;
+}
+
+.management-empty p {
+  font-size: 12px;
+}
+
+.management-dashboard-loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  color: #475569;
+  font-weight: 800;
+}
+
+@media (max-width: 800px) {
+
+  .management-dashboard-header {
+    padding: 15px;
+  }
+
+  .management-dashboard-header-actions {
+    flex-direction: column;
+  }
+
+  .management-stats {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .management-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .management-welcome {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .management-update-item {
+    flex-direction: column;
+  }
+
+  .management-update-meta {
+    align-items: flex-start;
+  }
+}

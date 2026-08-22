@@ -1,8 +1,12 @@
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "https://nexora-ecell-website-backend.onrender.com";
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://nexora-ecell-website-backend.onrender.com";
 
 async function request(endpoint, options = {}) {
-  const token = localStorage.getItem("nexora_access_token");
+  const token =
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("nexora_access_token") ||
+    localStorage.getItem("nexra_access_token");
 
   const headers = new Headers(options.headers || {});
 
@@ -22,7 +26,8 @@ async function request(endpoint, options = {}) {
     }
   );
 
-  const contentType = response.headers.get("content-type");
+  const contentType =
+    response.headers.get("content-type");
 
   const data = contentType?.includes("application/json")
     ? await response.json()
@@ -31,8 +36,10 @@ async function request(endpoint, options = {}) {
   if (!response.ok) {
     throw new Error(
       typeof data === "object"
-        ? data.message || data.detail || "Request failed"
-        : "Request failed"
+        ? data.message ||
+          data.detail ||
+          "Request failed"
+        : data || "Request failed"
     );
   }
 

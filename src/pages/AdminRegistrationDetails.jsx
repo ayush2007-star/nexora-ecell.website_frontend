@@ -47,7 +47,9 @@ export default function AdminRegistrationDetails() {
   );
 
   useEffect(() => {
-    const token = localStorage.getItem("nexora_access_token");
+    const token =  localStorage.getItem("access_token") ||
+  localStorage.getItem("nexora_access_token") ||
+  localStorage.getItem("nexra_access_token");
 
     if (!token || String(user?.role).toLowerCase() !== "admin") {
       navigate("/admin/login", { replace: true });
